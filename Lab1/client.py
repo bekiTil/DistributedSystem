@@ -1,8 +1,7 @@
 # -*- coding:utf-8 -*-
-import socket, threading, sys
+import socket, threading, sys, argparse
 
-ip_port = ('127.0.0.1', 9999)
-ENC = 'utf-8'
+ENC = "utf-8"
 BUF = 4096
 
 def reader(sock):
@@ -17,17 +16,22 @@ def reader(sock):
     except OSError:
         pass
     finally:
-      
         try:
             sock.close()
         except OSError:
             pass
 
 def main():
-    s = socket.socket()
-    s.connect(ip_port)
+    # Parse --host/--port
+    p = argparse.ArgumentParser()
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=9999)
+    args = p.parse_args()
 
-   
+    s = socket.socket()
+    s.connect((args.host, args.port))
+
+    # Non-daemon so process waits for Goodbye output
     t = threading.Thread(target=reader, args=(s,), daemon=False)
     t.start()
 
@@ -40,9 +44,12 @@ def main():
             s.sendall((msg + "\n").encode(ENC))
 
             if msg.lower() == "exit":
+                try:
+                    s.shutdown(socket.SHUT_WR)
+                except OSError:
+                    pass
                 break
     finally:
-     
         pass
 
 if __name__ == "__main__":

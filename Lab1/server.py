@@ -5,7 +5,7 @@ import threading
 from datetime import datetime
 
 
-ip_port = ('127.0.0.1', 9999)
+ip_port = ('0.0.0.0', 9999)
 ENC = 'utf-8'
 BUF = 4096
 BACKLOG = 50
@@ -14,10 +14,10 @@ BACKLOG = 50
 next_id = 1
 id_lock = threading.Lock()
 
-clients = {}           # id -> (conn_socket, (ip, port))
+clients = {}           
 clients_lock = threading.Lock()
 
-history = {}           # frozenset({id1,id2}) -> [ "<src> -> <dst> @ <ts>: <msg>", ... ]
+history = {}          
 history_lock = threading.Lock()
 
 
